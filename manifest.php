@@ -42,27 +42,14 @@ return array(
 		'rdf' => array(
 			dirname(__FILE__). '/models/ontology/taoresult.rdf'
 		),
-		'checks' => array(
-			array('type' => 'CheckFileSystemComponent', 'value' => array('id' => 'fs_taoResults_views_genpics', 'location' => 'taoResults/views/genpics', 'rights' => 'rw'))
-		),
 	    'php' => array(
             dirname(__FILE__). '/scripts/install/postInstall.php'
         )
-	),
-	'managementRole' => 'http://www.tao.lu/Ontologies/TAOResult.rdf#ResultsManagerRole',
-    'acl' => array(
-        array('grant', 'http://www.tao.lu/Ontologies/TAOResult.rdf#ResultsManagerRole', array('ext'=>'taoResults')),
-        array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole', array('ext'=>'taoResults', 'mod' => 'RestResults'))
-        
-    ),'optimizableClasses' => array(
-/*			'http://www.tao.lu/Ontologies/TAOResult.rdf#Result',
-			'http://www.tao.lu/Ontologies/TAOResult.rdf#Variable',*/
-			'http://www.tao.lu/Ontologies/TAOResult.rdf#ResponseVariable',
-			'http://www.tao.lu/Ontologies/TAOResult.rdf#OutcomeVariable',
-                        'http://www.tao.lu/Ontologies/TAOResult.rdf#TraceVariable',
-                        'http://www.tao.lu/Ontologies/TAOResult.rdf#ItemResult'/*
- * 
- */
+	),'optimizableClasses' => array(
+        'http://www.tao.lu/Ontologies/TAOResult.rdf#ResponseVariable',
+        'http://www.tao.lu/Ontologies/TAOResult.rdf#OutcomeVariable',
+        'http://www.tao.lu/Ontologies/TAOResult.rdf#TraceVariable',
+        'http://www.tao.lu/Ontologies/TAOResult.rdf#ItemResult'
 	),
 	'constants' => array(
 	 	# actions directory
