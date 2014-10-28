@@ -40,7 +40,7 @@ class DbResult
 
     public function __construct(){
 		parent::__construct();
-        common_ext_ExtensionsManager::singleton()->getExtensionById("taoResults");
+        common_ext_ExtensionsManager::singleton()->getExtensionById("taoOutcomeRdf");
 		$this->taoResultsStorage = new ResultsService();
        
     }
@@ -51,7 +51,7 @@ class DbResult
     public function spawnResult($deliveryResultIdentifier = null){
         
         $spawnedResult =  $this->taoResultsStorage->storeDeliveryResult($deliveryResultIdentifier)->getUri();
-        common_Logger::i("taoResults storage spawned result:".$spawnedResult);
+        common_Logger::i("taoOutcomeRdf storage spawned result:".$spawnedResult);
         return $spawnedResult;
     }
     /**
