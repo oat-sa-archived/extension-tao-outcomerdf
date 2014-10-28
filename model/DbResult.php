@@ -18,7 +18,16 @@
  *
  *
  */
-class taoResults_models_classes_DbResult 
+namespace oat\taoOutcomeRdf\model;
+
+use \common_Logger;
+use \common_ext_ExtensionsManager;
+use \core_kernel_classes_Resource;
+use \taoResultServer_models_classes_Variable;
+use \taoResultServer_models_classes_WritableResultStorage;
+use \tao_models_classes_GenerisService;
+
+class DbResult 
     extends tao_models_classes_GenerisService 
     implements taoResultServer_models_classes_WritableResultStorage {
 
@@ -32,7 +41,7 @@ class taoResults_models_classes_DbResult
     public function __construct(){
 		parent::__construct();
         common_ext_ExtensionsManager::singleton()->getExtensionById("taoResults");
-		$this->taoResultsStorage = new taoResults_models_classes_ResultsService();
+		$this->taoResultsStorage = new ResultsService();
        
     }
     /**

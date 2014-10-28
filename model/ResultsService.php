@@ -23,7 +23,22 @@
  * @package taoResults
  * 
  */
-class taoResults_models_classes_ResultsService extends tao_models_classes_ClassService
+namespace oat\taoOutcomeRdf\model;
+
+use \Exception;
+use \common_Exception;
+use \common_Logger;
+use \common_cache_FileCache;
+use \common_exception_Error;
+use \core_kernel_classes_Class;
+use \core_kernel_classes_DbWrapper;
+use \core_kernel_classes_Property;
+use \core_kernel_classes_Resource;
+use \taoResultServer_models_classes_Variable;
+use \tao_helpers_Date;
+use \tao_models_classes_ClassService;
+
+class ResultsService extends tao_models_classes_ClassService
 {
 
     /**

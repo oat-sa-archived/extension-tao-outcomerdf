@@ -211,7 +211,7 @@
     <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOResult.rdf#taoResultServerModel">
 	<rdfs:label xml:lang="en-US"><![CDATA[taoResults storage (database)]]></rdfs:label>
 	<rdfs:comment xml:lang="en-US"><![CDATA[TAO Result Server 2.5 (DB storage)]]></rdfs:comment>
-	<resultserver:implementation><![CDATA[taoResults_models_classes_DbResult]]></resultserver:implementation>
+	<resultserver:implementation><![CDATA[oat\taoOutcomeRdf\model\DbResult]]></resultserver:implementation>
 	<rdf:type rdf:resource="http://www.tao.lu/Ontologies/TAOResultServer.rdf#ResultServerModel"/>
    </rdf:Description>
      <rdf:Description rdf:about="http://www.tao.lu/Ontologies/TAOResult.rdf#taoResultServer">

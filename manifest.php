@@ -24,23 +24,21 @@ $extpath = dirname(__FILE__).DIRECTORY_SEPARATOR;
 $taopath = dirname(dirname(__FILE__)).DIRECTORY_SEPARATOR.'tao'.DIRECTORY_SEPARATOR;
 
 return array(
-	'name' => 'taoResults',
-    'label' => 'Result storage ontology',
-	'description' => 'TAO Results extension',
+	'name' => 'taoOutcomeRdf',
+    'label' => 'Ontology Outcome storage',
+	'description' => 'TAO Outcome RDF extension',
     'license' => 'GPL-2.0',
     'version' => '2.6',
 	'author' => 'Open Assessment Technologies, CRP Henri Tudor',
-    //taoItems is only needed for the item model property retrieval
 	'requires' => array(
-	    'taoResultServer'  => '2.6',
-        'taoItems' => '*'
+	    'taoResultServer'  => '2.6'
     ),
 	'models' => array(
 		'http://www.tao.lu/Ontologies/TAOResult.rdf'
 	),
 	'install' => array(
 		'rdf' => array(
-			dirname(__FILE__). '/models/ontology/taoresult.rdf'
+			dirname(__FILE__). '/scripts/install/taoresult.rdf'
 		),
 	    'php' => array(
             dirname(__FILE__). '/scripts/install/postInstall.php'
@@ -52,28 +50,14 @@ return array(
         'http://www.tao.lu/Ontologies/TAOResult.rdf#ItemResult'
 	),
 	'constants' => array(
-	 	# actions directory
-	 	"DIR_ACTIONS"			=> $extpath."actions".DIRECTORY_SEPARATOR,
-	
-		# views directory
-		"DIR_VIEWS"				=> $extpath."views".DIRECTORY_SEPARATOR,
-	
-		# default module name
-		'DEFAULT_MODULE_NAME'	=> 'Results',
-	
-		#default action name
-		'DEFAULT_ACTION_NAME'	=> 'index',
 	
 		#BASE PATH: the root path in the file system (usually the document root)
 		'BASE_PATH'				=> $extpath,
 	
 		#BASE URL (usually the domain root)
-		'BASE_URL'				=> ROOT_URL	.'taoResults/',
+		'BASE_URL'				=> ROOT_URL	.'taoOutcomeRdf/',
 	
 		#BASE WWW the web resources path
-		'BASE_WWW'				=> ROOT_URL .'taoResults/views/',
-
-		#the path were the event logs are saved
-		'EVENT_LOG_PATH'		=> ROOT_PATH.'taoResults/data',
+		'BASE_WWW'				=> ROOT_URL .'taoOutcomeRdf/views/'
 	)
 );
