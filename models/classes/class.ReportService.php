@@ -273,6 +273,4 @@ class taoResults_models_classes_ReportService extends taoResults_models_classes_
 		}
 
 
-} /* end of class taoResults_models_classes_ResultsService */
-
-?>
+}

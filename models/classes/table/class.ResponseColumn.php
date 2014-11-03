@@ -55,6 +55,4 @@ class taoResults_models_classes_table_ResponseColumn
         return $returnValue;
     }
 
-} /* end of class taoResults_models_classes_table_ResponseColumn */
-
-?>
+}
