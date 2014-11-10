@@ -31,11 +31,11 @@ use \taoResultServer_models_classes_Variable;
 use \taoResultServer_models_classes_WritableResultStorage;
 use \tao_models_classes_GenerisService;
 
-class DbResult 
-    extends tao_models_classes_GenerisService 
+class DbResult
+    extends tao_models_classes_GenerisService
     implements
-        \taoResultServer_models_classes_WritableResultStorage,
-        ResultManagement
+    \taoResultServer_models_classes_WritableResultStorage,
+    ResultManagement
 {
 
     /**
@@ -46,15 +46,15 @@ class DbResult
 
 
     /**
-    * @param string deliveryResultIdentifier if no such deliveryResult with this identifier exists a new one gets created
-    */
+     * @param string deliveryResultIdentifier if no such deliveryResult with this identifier exists a new one gets created
+     */
 
     public function __construct()
     {
-		parent::__construct();
+        parent::__construct();
         common_ext_ExtensionsManager::singleton()->getExtensionById("taoOutcomeRdf");
         $this->taoResultsStorage = ResultsService::singleton();
-       
+
     }
 
     /**
@@ -63,16 +63,16 @@ class DbResult
      */
     public function spawnResult($deliveryResultIdentifier = null)
     {
-        
+
         $spawnedResult = $this->taoResultsStorage->storeDeliveryResult($deliveryResultIdentifier)->getUri();
         common_Logger::i("taoOutcomeRdf storage spawned result:" . $spawnedResult);
         return $spawnedResult;
     }
 
     /**
-    * @param string testTakerIdentifier (uri recommended)
+     * @param string testTakerIdentifier (uri recommended)
      *
-    */
+     */
     public function storeRelatedTestTaker($deliveryResultIdentifier, $testTakerIdentifier)
     {
         // spawns a new delivery result or retrieve an existing one with this identifier
@@ -81,8 +81,8 @@ class DbResult
     }
 
     /**
-    * @param string deliveryIdentifier (uri recommended)
-    */
+     * @param string deliveryIdentifier (uri recommended)
+     */
     public function storeRelatedDelivery($deliveryResultIdentifier, $deliveryIdentifier)
     {
         //spawns a new delivery result or retrieve an existing one with this identifier
@@ -91,12 +91,12 @@ class DbResult
     }
 
     /**
-    * Submit a specific Item Variable, (ResponseVariable and OutcomeVariable shall be used respectively for collected data and score/interpretation computation)
-    * @param string test (uri recommended)
-    * @param string item (uri recommended)
-    * @param taoResultServer_models_classes_ItemVariable itemVariable
-    * @param string callId contextual call id for the variable, ex. :  to distinguish the same variable output by the same item but taht is presented several times in the same test 
-    */
+     * Submit a specific Item Variable, (ResponseVariable and OutcomeVariable shall be used respectively for collected data and score/interpretation computation)
+     * @param string test (uri recommended)
+     * @param string item (uri recommended)
+     * @param taoResultServer_models_classes_ItemVariable itemVariable
+     * @param string callId contextual call id for the variable, ex. :  to distinguish the same variable output by the same item but taht is presented several times in the same test
+     */
     public function storeItemVariable(
         $deliveryResultIdentifier,
         $test,
@@ -111,10 +111,10 @@ class DbResult
     }
 
     /** Submit a complete Item result
-    *
-    * @param taoResultServer_models_classes_ItemResult itemResult
-    * @param string callId an id for the item instanciation
-    */
+     *
+     * @param taoResultServer_models_classes_ItemResult itemResult
+     * @param string callId an id for the item instanciation
+     */
     public function storeTestVariable(
         $deliveryResultIdentifier,
         $test,
@@ -133,7 +133,7 @@ class DbResult
 
     public function deleteResult($deliveryResultIdentifier)
     {
-		return $this->taoResultsStorage->deleteResult(
+        return $this->taoResultsStorage->deleteResult(
             new core_kernel_classes_Resource($deliveryResultIdentifier)
         );
     }
