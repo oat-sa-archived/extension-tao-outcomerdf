@@ -25,7 +25,7 @@ use \common_ext_ExtensionsManager;
 use \core_kernel_classes_Class;
 use \core_kernel_classes_Property;
 use \core_kernel_classes_Resource;
-use oat\taoOutcomeUi\model\ResultsService;
+use oat\taoOutcomeRdf\model\ResultsService;
 use oat\taoResultServer\models\classes\ResultManagement;
 use \taoResultServer_models_classes_Variable;
 use \taoResultServer_models_classes_WritableResultStorage;
@@ -34,7 +34,7 @@ use \tao_models_classes_GenerisService;
 class DbResult
     extends tao_models_classes_GenerisService
     implements
-    \taoResultServer_models_classes_WritableResultStorage,
+    taoResultServer_models_classes_WritableResultStorage,
     ResultManagement
 {
 
@@ -140,24 +140,10 @@ class DbResult
 
     public function getDelivery($deliveryResultIdentifier)
     {
-        $deliveryResultClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
-        $deliveryResults = $deliveryResultClass->searchInstances(
-            array(PROPERTY_RESULT_OF_DELIVERY => $deliveryResultIdentifier),
-            array('like' => false, 'recursive' => false)
+        return current(
+            $this->getDeliveryResult($deliveryResultIdentifier)
+                 ->getPropertyValues(new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY))
         );
-
-        $count = count($deliveryResults);
-
-        if ($count == 1) {
-
-            return array_shift($deliveryResults);
-        } elseif ($count > 1) {
-
-            throw new \common_exception_Error('More than 1 deliveryResult for the corresponding Id ' . $deliveryResultIdentifier);
-        } else {
-
-            throw new \common_exception_Error('deliveryResult for the corresponding Id ' . $deliveryResultIdentifier . ' could not be found');
-        }
     }
 
     /**
@@ -257,9 +243,10 @@ class DbResult
 
     public function getTestTaker($deliveryResultIdentifier)
     {
-		return $this->taoResultsStorage->getTestTaker(
-			new core_kernel_classes_Resource($deliveryResultIdentifier)
-		);
+        return current(
+            $this->getDeliveryResult($deliveryResultIdentifier)
+                 ->getPropertyValues(new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT))
+        );
     }
 
     public function getAllCallIds()
@@ -283,19 +270,18 @@ class DbResult
 
         $returnValue = array();
 
-        if (!empty($deliveryResults)) {
+        foreach ($deliveryResults as $deliveryResult) {
+            $properties = $deliveryResult->getPropertiesValues(array(
+                PROPERTY_IDENTIFIER,
+				PROPERTY_RESULT_OF_SUBJECT,
+                PROPERTY_RESULT_OF_DELIVERY
+            ));
 
-            foreach ($deliveryResults as $deliveryResult) {
-	            $properties = $deliveryResult->getPropertiesValues(array(
-					PROPERTY_RESULT_OF_DELIVERY,
-					PROPERTY_IDENTIFIER
-				));
-
-				$returnValue[] = array(
-					'deliveryResultIdentifier' => $properties[PROPERTY_RESULT_OF_DELIVERY][0]->getUri(),
-					'deliveryIdentifier'       => $properties[PROPERTY_IDENTIFIER][0]->getUri(),
-				);
-            }
+            $returnValue[] = array(
+				'deliveryResultIdentifier' => $properties[PROPERTY_IDENTIFIER][0]->getUri(),
+				'testTakerIdentifier'      => $properties[PROPERTY_RESULT_OF_SUBJECT][0]->getUri(),
+                'deliveryIdentifier'       => $properties[PROPERTY_RESULT_OF_DELIVERY][0]->getUri(),
+            );
         }
 
         return $returnValue;
@@ -310,13 +296,15 @@ class DbResult
 
 		foreach ($deliveryResults as $deliveryResult) {
 			$properties = $deliveryResult->getPropertiesValues(array(
-				PROPERTY_RESULT_OF_DELIVERY,
-				PROPERTY_RESULT_OF_SUBJECT
+				PROPERTY_IDENTIFIER,
+				PROPERTY_RESULT_OF_SUBJECT,
+                PROPERTY_RESULT_OF_DELIVERY
 			));
 
 			$returnValue[] = array(
-				'deliveryResultIdentifier' => $properties[PROPERTY_RESULT_OF_DELIVERY][0]->getUri(),
+				'deliveryResultIdentifier' => $properties[PROPERTY_IDENTIFIER][0]->getUri(),
 				'testTakerIdentifier'      => $properties[PROPERTY_RESULT_OF_SUBJECT][0]->getUri(),
+				'deliveryIdentifier'       => $properties[PROPERTY_RESULT_OF_DELIVERY][0]->getUri()
 			);
 		}
 
@@ -325,9 +313,10 @@ class DbResult
 
     public function getRelatedItemCallIds($deliveryResultIdentifier)
     {
-        return $this->taoResultsStorage->getItemResultsFromDeliveryResult(
+        $data = $this->taoResultsStorage->getItemResultsFromDeliveryResult(
 			new core_kernel_classes_Resource($deliveryResultIdentifier)
 		);
+        return $data;
     }
 
     public function getVariable($callId, $variableIdentifier)
