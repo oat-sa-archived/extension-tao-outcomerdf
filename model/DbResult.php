@@ -140,10 +140,10 @@ class DbResult
 
     public function getDelivery($deliveryResultIdentifier)
     {
-        return current(
-            $this->getDeliveryResult($deliveryResultIdentifier)
-                 ->getPropertyValues(new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY))
-        );
+        $deliveryResult = new core_kernel_classes_Resource($deliveryResultIdentifier);
+        return $deliveryResult->getUniquePropertyValue(
+            new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY)
+        )->getUri();
     }
 
     /**
@@ -243,10 +243,10 @@ class DbResult
 
     public function getTestTaker($deliveryResultIdentifier)
     {
-        return current(
-            $this->getDeliveryResult($deliveryResultIdentifier)
-                 ->getPropertyValues(new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT))
-        );
+        $deliveryResult = new core_kernel_classes_Resource($deliveryResultIdentifier);
+        return $deliveryResult->getUniquePropertyValue(
+            new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT)
+        )->getUri();
     }
 
     public function getAllCallIds()
@@ -269,18 +269,14 @@ class DbResult
         $deliveryResults = $deliveryResultClass->searchInstances();
 
         $returnValue = array();
+        $property = new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY);
 
         foreach ($deliveryResults as $deliveryResult) {
-            $properties = $deliveryResult->getPropertiesValues(array(
-                PROPERTY_IDENTIFIER,
-				PROPERTY_RESULT_OF_SUBJECT,
-                PROPERTY_RESULT_OF_DELIVERY
-            ));
+            $p = $deliveryResult->getUniquePropertyValue($property);
 
             $returnValue[] = array(
-				'deliveryResultIdentifier' => $properties[PROPERTY_IDENTIFIER][0]->getUri(),
-				'testTakerIdentifier'      => $properties[PROPERTY_RESULT_OF_SUBJECT][0]->getUri(),
-                'deliveryIdentifier'       => $properties[PROPERTY_RESULT_OF_DELIVERY][0]->getUri(),
+				'deliveryResultIdentifier' => $deliveryResult->getUri(),
+                'deliveryIdentifier'       => $p->getUri()
             );
         }
 
@@ -294,17 +290,13 @@ class DbResult
 
         $returnValue = array();
 
-		foreach ($deliveryResults as $deliveryResult) {
-			$properties = $deliveryResult->getPropertiesValues(array(
-				PROPERTY_IDENTIFIER,
-				PROPERTY_RESULT_OF_SUBJECT,
-                PROPERTY_RESULT_OF_DELIVERY
-			));
+        $property = new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT);
 
+		foreach ($deliveryResults as $deliveryResult) {
+            $p = $deliveryResult->getUniquePropertyValue($property);
 			$returnValue[] = array(
-				'deliveryResultIdentifier' => $properties[PROPERTY_IDENTIFIER][0]->getUri(),
-				'testTakerIdentifier'      => $properties[PROPERTY_RESULT_OF_SUBJECT][0]->getUri(),
-				'deliveryIdentifier'       => $properties[PROPERTY_RESULT_OF_DELIVERY][0]->getUri()
+				'deliveryResultIdentifier' => $deliveryResult->getUri(),
+				'testTakerIdentifier'      => $p->getUri()
 			);
 		}
 
@@ -313,10 +305,11 @@ class DbResult
 
     public function getRelatedItemCallIds($deliveryResultIdentifier)
     {
-        $data = $this->taoResultsStorage->getItemResultsFromDeliveryResult(
-			new core_kernel_classes_Resource($deliveryResultIdentifier)
-		);
-        return $data;
+        return array_keys(
+            $this->taoResultsStorage->getItemResultsFromDeliveryResult(
+                new core_kernel_classes_Resource($deliveryResultIdentifier)
+            )
+        );
     }
 
     public function getVariable($callId, $variableIdentifier)
@@ -334,38 +327,31 @@ class DbResult
         return $returnValue;
     }
 
-    public function getVariables($callId)
+    public function getDeliveryResultVariables($deliveryResultIdentifier)
     {
-		return $this->taoResultsStorage->getVariablesFromItemResult(
-			new core_kernel_classes_Resource($callId)
-		);
+        return $this->taoResultsStorage->getVariableDataFromDeliveryResult(
+            new core_kernel_classes_Resource($deliveryResultIdentifier)
+        );
     }
 
-	/**
-	 * get delivery result from its Identifier
-	 * @param string $deliveryResultIdentifier
-	 * @return core_kernel_classes_Resource
-	 * @throws common_exception_Error
-	 */
-    public function getDeliveryResult($deliveryResultIdentifier)
+    public function getDeliveryItemVariables($deliveryResultIdentifier, $filters)
     {
-        $deliveryResultClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
-        $deliveryResults = $deliveryResultClass->searchInstances(
-            array(PROPERTY_IDENTIFIER => $deliveryResultIdentifier),
-            array('like' => false, 'recursive' => false)
+        return $this->taoResultsStorage->getItemVariableDataFromDeliveryResult(
+            new core_kernel_classes_Resource($deliveryResultIdentifier), $filters
+        );
+    }
+
+    public function getItemFromItemResult($itemResult)
+    {
+        $call = new core_kernel_classes_Resource($itemResult);
+        return $call->getUniquePropertyValue(
+            new core_kernel_classes_Property(PROPERTY_RELATED_ITEM)
         );
 
-        if (count($deliveryResults) == 1) {
-            return current($deliveryResults);
-        }
+    }
 
-        if (empty($deliveryResults)) {
-            throw new common_exception_Error('Delivery result for the corresponding Id ' . $deliveryResultIdentifier . ' could not be found');
-        }
-        else {
-            throw new common_exception_Error('More than 1 delivery result for the corresponding Id ' . $deliveryResultIdentifier);
-        }
-		
+    public function getVariables($callId) {
+        
     }
 
 }

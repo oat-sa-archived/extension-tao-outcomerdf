@@ -149,7 +149,7 @@ class ResultsService extends tao_models_classes_ClassService
     }
 
     /**
-     * Returns all itemResults related to the delvieryResults
+     * Returns all itemResults related to the delvieryResult
      * 
      * @param core_kernel_classes_Resource $deliveryResult            
      * @return array core_kernel_classes_Resource
@@ -284,18 +284,26 @@ class ResultsService extends tao_models_classes_ClassService
                     $properties[] = PROPERTY_RESPONSE_VARIABLE_CORRECTRESPONSE;
                 }
                 
-                $baseTypes = $variable->getPropertyValues(new core_kernel_classes_Property(PROPERTY_VARIABLE_BASETYPE));
-                $baseType = current($baseTypes);
-                if ($baseType != "file") {
+                if (
+                    current(
+                        $variable->getPropertyValues(
+                            new core_kernel_classes_Property(PROPERTY_VARIABLE_BASETYPE)
+                        )
+                    ) == "file"
+                ) {
+                    $variableDescription = $variable->getPropertiesValues($properties);
+                } else {
                     $properties[] = RDF_VALUE;
                     $variableDescription = $variable->getPropertiesValues($properties);
                     
                     $variableDescription[RDF_VALUE] = array(
                         base64_decode(current($variableDescription[RDF_VALUE]))
                     );
-                } else {
-                    $variableDescription = $variable->getPropertiesValues($properties);
                 }
+
+                $variableDescription[PROPERTY_VARIABLE_BASETYPE] = current($variableDescription[PROPERTY_VARIABLE_BASETYPE]);
+                $variableDescription[PROPERTY_VARIABLE_CARDINALITY] = current($variableDescription[PROPERTY_VARIABLE_CARDINALITY]);
+
                 try {
                     common_Logger::d("Retrieving related Item for itemResult " . $itemResult->getUri() . "");
                     $relatedItem = $this->getItemFromVariable($variable);
@@ -385,6 +393,29 @@ class ResultsService extends tao_models_classes_ClassService
         
         return $variablesByItem;
     }
+    /**
+     * 
+     * @param unknown $a
+     * @param unknown $b
+     * @return number
+     */
+    public static function sortTimeStamps($a, $b) {
+        list($usec, $sec) = explode(" ", $a);
+        $floata = ((float) $usec + (float) $sec);
+        list($usec, $sec) = explode(" ", $b);
+        $floatb = ((float) $usec + (float) $sec);
+        //common_Logger::i($a." ".$floata);
+        //common_Logger::i($b. " ".$floatb);
+        //the callback is expecting an int returned, for the case where the difference is of less than a second
+        //intval(round(floatval($b) - floatval($a),1, PHP_ROUND_HALF_EVEN));
+        if ((floatval($floata) - floatval($floatb)) > 0) {
+            return 1;
+        } elseif ((floatval($floata) - floatval($floatb)) < 0) {
+            return -1;
+        } else {
+            return 0;
+        }
+    }
 
     /**
      * return all variables linked to the delviery result and that are not linked to a particular itemResult
@@ -405,20 +436,21 @@ class ResultsService extends tao_models_classes_ClassService
             'like' => false
         ));
         foreach ($variables as $variable) {
-            
+
             $variableDescription = $variable->getPropertiesValues(array(
-                PROPERTY_IDENTIFIER,
-                RDF_VALUE,
-                PROPERTY_VARIABLE_CARDINALITY,
-                PROPERTY_VARIABLE_BASETYPE,
-                PROPERTY_VARIABLE_EPOCH
+                    PROPERTY_IDENTIFIER,
+                    RDF_VALUE,
+                    PROPERTY_VARIABLE_CARDINALITY,
+                    PROPERTY_VARIABLE_BASETYPE,
+                    PROPERTY_VARIABLE_EPOCH
             ));
-            core_kernel_classes_DbWrapper::singleton()->debug = false;
+            foreach($variableDescription as $key => $value) {
+                $variableDescription[$key] = current($value);
+            }
+
             $class = current($variable->getTypes());
             $variableDescription[RDF_TYPE] = $class->getUri();
-            $variableDescription[RDF_VALUE] = array(
-                base64_decode(current($variableDescription[RDF_VALUE]))
-            );
+            $variableDescription[RDF_VALUE] = base64_decode(current($variableDescription[RDF_VALUE]));
             $variablesData[] = $variableDescription;
         }
         return $variablesData;
