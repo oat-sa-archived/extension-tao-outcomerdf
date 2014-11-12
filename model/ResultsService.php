@@ -31,12 +31,15 @@ use \common_Logger;
 use \common_cache_FileCache;
 use \common_exception_Error;
 use \core_kernel_classes_Class;
-use \core_kernel_classes_DbWrapper;
 use \core_kernel_classes_Property;
 use \core_kernel_classes_Resource;
 use \taoResultServer_models_classes_Variable;
 use \tao_helpers_Date;
 use \tao_models_classes_ClassService;
+use qtism\common\datatypes\Float;
+use qtism\common\enums\BaseType;
+use qtism\common\enums\Cardinality;
+use qtism\runtime\common\OutcomeVariable;
 
 class ResultsService extends tao_models_classes_ClassService
 {
@@ -421,11 +424,11 @@ class ResultsService extends tao_models_classes_ClassService
      * return all variables linked to the delviery result and that are not linked to a particular itemResult
      *
      * @param core_kernel_classes_Resource $deliveryResult            
-     * @return multitype:multitype:string
+     * @return array An array of OutcomeVariable
      */
     public function getVariableDataFromDeliveryResult(core_kernel_classes_Resource $deliveryResult)
     {
-        $variablesData = array();
+        $returnValue = array();
         
         $variableClass = new core_kernel_classes_Class(TAO_RESULT_VARIABLE);
         
@@ -437,23 +440,29 @@ class ResultsService extends tao_models_classes_ClassService
         ));
         foreach ($variables as $variable) {
 
-            $variableDescription = $variable->getPropertiesValues(array(
+            $variableDescription = $variable->getPropertiesValues(
+                array(
                     PROPERTY_IDENTIFIER,
                     RDF_VALUE,
                     PROPERTY_VARIABLE_CARDINALITY,
-                    PROPERTY_VARIABLE_BASETYPE,
-                    PROPERTY_VARIABLE_EPOCH
-            ));
-            foreach($variableDescription as $key => $value) {
-                $variableDescription[$key] = current($value);
-            }
+                    PROPERTY_VARIABLE_BASETYPE
+                )
+            );
 
-            $class = current($variable->getTypes());
-            $variableDescription[RDF_TYPE] = $class->getUri();
-            $variableDescription[RDF_VALUE] = base64_decode(current($variableDescription[RDF_VALUE]));
-            $variablesData[] = $variableDescription;
+            $returnValue[] = new OutcomeVariable(
+                $variableDescription[PROPERTY_IDENTIFIER][0]->__toString(),
+                Cardinality::getConstantByName(
+                    $variableDescription[PROPERTY_VARIABLE_CARDINALITY][0]->__toString()
+                ),
+                BaseType::getConstantByName(
+                    current($variableDescription[PROPERTY_VARIABLE_BASETYPE])
+                ),
+                new Float((float) base64_decode(current($variableDescription[RDF_VALUE])))
+            );
+
         }
-        return $variablesData;
+
+        return $returnValue;
     }
 
     /**
