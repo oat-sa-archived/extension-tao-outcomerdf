@@ -22,8 +22,10 @@ namespace oat\taoOutcomeRdf\model;
 
 use \common_Logger;
 use \common_ext_ExtensionsManager;
+use \core_kernel_classes_Class;
+use \core_kernel_classes_Property;
 use \core_kernel_classes_Resource;
-use oat\taoOutcomeUi\model\ResultsService;
+use oat\taoOutcomeRdf\model\ResultsService;
 use oat\taoResultServer\models\classes\ResultManagement;
 use \taoResultServer_models_classes_Variable;
 use \taoResultServer_models_classes_WritableResultStorage;
@@ -32,7 +34,7 @@ use \tao_models_classes_GenerisService;
 class DbResult
     extends tao_models_classes_GenerisService
     implements
-    \taoResultServer_models_classes_WritableResultStorage,
+    taoResultServer_models_classes_WritableResultStorage,
     ResultManagement
 {
 
@@ -131,54 +133,27 @@ class DbResult
 
     public function deleteResult($deliveryResultIdentifier)
     {
-        $deliveryResult = $this->getDelivery($deliveryResultIdentifier);
-        $this->taoResultsStorage->deleteResult($deliveryResult);
-    }
-
-    public function getAllDeliveryIds()
-    {
-        $deliveryResultClass = new \core_kernel_classes_Class(TAO_DELIVERY_RESULT);
-        $deliveryResults = $deliveryResultClass->searchInstances();
-
-        $returnValue = array();
-
-        foreach ($deliveryResults as $deliveryResult) {
-            $returnValue[] = $deliveryResult->getUniquePropertyValue(
-                new \core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY)
-            )->getUri();
-        }
-
-        return $returnValue;
+        return $this->taoResultsStorage->deleteResult(
+            new core_kernel_classes_Resource($deliveryResultIdentifier)
+        );
     }
 
     public function getDelivery($deliveryResultIdentifier)
     {
-        $deliveryResultClass = new \core_kernel_classes_Class(TAO_DELIVERY_RESULT);
-        $deliveryResults = $deliveryResultClass->searchInstances(
-            array(PROPERTY_IDENTIFIER => $deliveryResultIdentifier),
-            array('like' => false, 'recursive' => false)
-        );
-
-        $count = count($deliveryResults);
-
-        if ($count == 1) {
-
-            return array_shift($deliveryResults);
-        } elseif ($count > 1) {
-
-            throw new \common_exception_Error('More than 1 deliveryResult for the corresponding Id ' . $deliveryResultIdentifier);
-        } else {
-
-            throw new \common_exception_Error('deliveryResult for the corresponding Id ' . $deliveryResultIdentifier . ' could not be found');
-        }
+        $deliveryResult = new core_kernel_classes_Resource($deliveryResultIdentifier);
+        return $deliveryResult->getUniquePropertyValue(
+            new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY)
+        )->getUri();
     }
 
     /**
-     * @param $columns list of columns on which to search array('http://www.tao.lu/Ontologies/TAOResult.rdf#resultOfSubject','http://www.tao.lu/Ontologies/TAOResult.rdf#resultOfDelivery')
-     * @param $filter list of valueto search array('http://www.tao.lu/Ontologies/TAOResult.rdf#resultOfSubject' => array('test','myValue'))
-     * @return mixed test taker, delivery and delivery result that match the filter array(array('deliveryResultIdentifier' => '123', 'testTakerIdentifier' => '456', 'deliveryIdentifier' => '789'))
+     * 
+     * @param array $columns
+     * @param array $filter
+     * @return array
+     * @throws common_exception_Error
      */
-    public function getResultByColumn($columns, $filter, $options = array())
+    private function getFilters($columns, $filter)
     {
         $searchTarget = array(
             'deliveryResultIdentifier' => PROPERTY_IDENTIFIER,
@@ -202,51 +177,65 @@ class DbResult
         foreach ($columns as $column) {
 
             if (isset($filter[$column])) {
-
-                $columnValue = $filter[$column];
-                if (is_array($columnValue)) {
-
-                    $count = count($columnValue);
-                    if ($count > 1) {
-                        $search[$column] = $columnValue;
-                    } elseif ($count == 1) {
-                        $search[$column] = current($columnValue);
-                    }
-
-                } else {
-
-                    $search[$column] = $columnValue;
-                }
+                $search[$column] = $filter[$column];
             }
         }
 
-        // make sure we have managed some filters for this search
-        if (count($search) < 2) {
-            throw new \common_exception_Error('Search is missing filters');
-        }
+        return $search;
 
-        $options['like'] = false;
-        $options['recursive'] = false;
+    }
 
-        $deliveryResultClass = new \core_kernel_classes_Class(TAO_DELIVERY_RESULT);
-        $deliveryResults = $deliveryResultClass->searchInstances($search, $options);
+    /**
+     * @see oat\taoResultServer\models\classes\ResultManagement::countResultByFilter
+     */
+    public function countResultByFilter($columns, $filter) {
+
+        $propertyFilters = $this->getFilters($columns, $filter);
+
+        $deliveryResultClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+
+        $returnValue = (int) 0;
+
+        $returnValue = $deliveryResultClass->countInstances(
+            $propertyFilters,
+            array(
+                'like'      => false,
+                'recursive' => false
+            )
+        );
+
+        return $returnValue;
+    }
+
+    public function getResultByColumn($columns, $filter, $options = array())
+    {
 
         $returnValue = array();
+        $options['like'] = false;
+        $propertyFilters = $this->getFilters($columns, $filter);
+        $deliveryResultClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+
+        $deliveryResults = $deliveryResultClass->searchInstances($propertyFilters, $options);
+
+        if (!is_array($deliveryResults)) {
+            return $returnValue;
+        }
+
+        $properties = array(
+            PROPERTY_IDENTIFIER,
+            PROPERTY_RESULT_OF_SUBJECT,
+            PROPERTY_RESULT_OF_DELIVERY
+        );
 
         foreach ($deliveryResults as $deliveryResult) {
-            $properties = $deliveryResult->getPropertiesValues(
-                array(
-                    PROPERTY_IDENTIFIER,
-                    PROPERTY_RESULT_OF_SUBJECT,
-                    PROPERTY_RESULT_OF_DELIVERY
-                )
-            );
+            $values = $deliveryResult->getPropertiesValues($properties);
 
-            $arrayProperties = array();
-            foreach ($properties as $key => $property) {
-                $arrayProperties[$key] = $property[0]->getUri();
+            $ret = array();
+            foreach ($values as $key => $property) {
+                $ret[$key] = $property[0]->getUri();
             }
-            $returnValue[] = $arrayProperties;
+            $returnValue[] = $ret;
+
         }
 
         return $returnValue;
@@ -254,21 +243,41 @@ class DbResult
 
     public function getTestTaker($deliveryResultIdentifier)
     {
-        $deliveryResult = $this->getDelivery($deliveryResultIdentifier);
-        return $this->taoResultsStorage->getTestTaker($deliveryResult);
+        $deliveryResult = new core_kernel_classes_Resource($deliveryResultIdentifier);
+        return $deliveryResult->getUniquePropertyValue(
+            new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT)
+        )->getUri();
     }
 
     public function getAllCallIds()
     {
-        $deliveryResultClass = new \core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+        $deliveryResultClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
         $deliveryResults = $deliveryResultClass->searchInstances();
 
         $returnValue = array();
 
+        foreach($deliveryResults as $deliveryResult) {
+            $returnValue[] = $deliveryResult->getUniquePropertyValue(new core_kernel_classes_Property(RDFS_LABEL))->__toString();
+        }
+
+        return $returnValue;
+    }
+
+    public function getAllDeliveryIds()
+    {
+        $deliveryResultClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+        $deliveryResults = $deliveryResultClass->searchInstances();
+
+        $returnValue = array();
+        $property = new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY);
+
         foreach ($deliveryResults as $deliveryResult) {
-            $returnValue[] = $deliveryResult->getUniquePropertyValue(
-                new \core_kernel_classes_Property(RDFS_LABEL)
-            )->__toString();
+            $p = $deliveryResult->getUniquePropertyValue($property);
+
+            $returnValue[] = array(
+				'deliveryResultIdentifier' => $deliveryResult->getUri(),
+                'deliveryIdentifier'       => $p->getUri()
+            );
         }
 
         return $returnValue;
@@ -276,39 +285,38 @@ class DbResult
 
     public function getAllTestTakerIds()
     {
-        $deliveryResultClass = new \core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+        $deliveryResultClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
         $deliveryResults = $deliveryResultClass->searchInstances();
 
         $returnValue = array();
 
-        foreach ($deliveryResults as $deliveryResult) {
-            $returnValue[] = $deliveryResult->getUniquePropertyValue(
-                new \core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT)
-            )->getUri();
-        }
+        $property = new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT);
+
+		foreach ($deliveryResults as $deliveryResult) {
+            $p = $deliveryResult->getUniquePropertyValue($property);
+			$returnValue[] = array(
+				'deliveryResultIdentifier' => $deliveryResult->getUri(),
+				'testTakerIdentifier'      => $p->getUri()
+			);
+		}
 
         return $returnValue;
     }
 
     public function getRelatedItemCallIds($deliveryResultIdentifier)
     {
-        $deliveryResult = $this->getDelivery($deliveryResultIdentifier);
-        $returnValue = $deliveryResult->getUniquePropertyValue(new \core_kernel_classes_Property(RDFS_LABEL));
-
-        return $returnValue;
+        return array_keys(
+            $this->taoResultsStorage->getItemResultsFromDeliveryResult(
+                new core_kernel_classes_Resource($deliveryResultIdentifier)
+            )
+        );
     }
 
     public function getVariable($callId, $variableIdentifier)
     {
-        $variables = $this->getVariables($callId);
-
-        $returnValue = false;
-
-        if (isset($variables[$variableIdentifier])) {
-            $returnValue = $variables[$variableIdentifier];
-        }
-
-        return $returnValue;
+		return $this->taoResultsStorage->getVariableData(
+			new core_kernel_classes_Resource($variableIdentifier)
+		);
     }
 
     public function getVariableProperty($variableId, $property)
@@ -319,35 +327,31 @@ class DbResult
         return $returnValue;
     }
 
-    public function getVariables($callId)
+    public function getDeliveryResultVariables($deliveryResultIdentifier)
     {
-        $deliveryResultClass = new \core_kernel_classes_Class(TAO_DELIVERY_RESULT);
-        $deliveryResults = $deliveryResultClass->searchInstances(
-            array(RDFS_LABEL => $callId),
-            array(
-                'like' => false,
-                'recursive' => false
-            )
+        return $this->taoResultsStorage->getVariableDataFromDeliveryResult(
+            new core_kernel_classes_Resource($deliveryResultIdentifier)
+        );
+    }
+
+    public function getDeliveryItemVariables($deliveryResultIdentifier, $filters)
+    {
+        return $this->taoResultsStorage->getItemVariableDataFromDeliveryResult(
+            new core_kernel_classes_Resource($deliveryResultIdentifier), $filters
+        );
+    }
+
+    public function getItemFromItemResult($itemResult)
+    {
+        $call = new core_kernel_classes_Resource($itemResult);
+        return $call->getUniquePropertyValue(
+            new core_kernel_classes_Property(PROPERTY_RELATED_ITEM)
         );
 
-        $returnValue = array();
-
-        foreach ($deliveryResults as $deliveryResult) {
-            $returnValue = $this->taoResultsStorage->getVariables($deliveryResult);
-        }
-
-        return $returnValue;
     }
 
-    /**
-     * @param $columns list of columns on which to search array('http://www.tao.lu/Ontologies/TAOResult.rdf#resultOfSubject','http://www.tao.lu/Ontologies/TAOResult.rdf#resultOfDelivery')
-     * @param $filter list of value to search array('http://www.tao.lu/Ontologies/TAOResult.rdf#resultOfSubject' => array('test','myValue'))
-     * @return int the number of results that match filter
-     */
-    public function countResultByFilter($columns, $filter)
-    {
-        // TODO: Implement countResultByFilter() method.
+    public function getVariables($callId) {
+        
     }
+
 }
-
-?>
