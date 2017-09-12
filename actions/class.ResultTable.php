@@ -19,6 +19,8 @@
  *
  */
 
+use oat\taoResultServer\models\classes\ResultService;
+
 
 /**
  * should be entirelyrefactored
@@ -70,7 +72,7 @@ class taoResults_actions_ResultTable extends tao_actions_Table {
      */
     public function getResultOfSubjectColumn(){
 
-		$testtaker = new tao_models_classes_table_PropertyColumn(new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT));
+		$testtaker = new tao_models_classes_table_PropertyColumn(new core_kernel_classes_Property(ResultService::PROPERTY_SUBJECT));
 		$arr[] = $testtaker->toArray();
                 echo json_encode(array(
                         'columns' => $arr
@@ -95,7 +97,7 @@ class taoResults_actions_ResultTable extends tao_actions_Table {
 
 		$columns = array();
 		$filter = $this->getFilterState('filter');
-		$deliveryResultClass	= new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+		$deliveryResultClass	= new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
 
 		//The list of delivery Results matching the current selection filters
 		$results	= $deliveryResultClass->searchInstances($filter, array ('recursive'=>true));
@@ -221,7 +223,7 @@ class taoResults_actions_ResultTable extends tao_actions_Table {
         $searchString = $this->getRequestParameter('searchString');
         $start = $limit * $page - $limit;
         $response = new stdClass();
-       	$clazz = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+       	$clazz = new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
         $results = $clazz->searchInstances($filter, array ('recursive'=>true, 'like' => false,'offset' => $start, 'limit' => $limit));
         $counti	= count($results);
         $dpmap = array();

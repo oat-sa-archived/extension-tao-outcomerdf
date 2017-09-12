@@ -1,5 +1,6 @@
 <?php
 use oat\tao\helpers\Template;
+use oat\taoResultServer\models\classes\ResultService;
 ?>
 <?php if(get_data('message')):?>
 	<div id="info-box" class="ui-widget-header ui-corner-all auto-slide">
@@ -26,7 +27,7 @@ require(['jquery', 'i18n', 'taoResults/resultTable', 'grid/tao.grid', 'jquery.fi
 	    document.getActionViewResultUrl= "<?=_url('viewResult','Results')?>";
 	    document.JsonFilter = <?=tao_helpers_Javascript::buildObject(get_data("filter"))?>;
 	    document.JsonFilterSelection = <?=tao_helpers_Javascript::buildObject(array('filter' => get_data("filter")))?>;
-	    document.resultOfSubjectConstant = "<?php echo PROPERTY_RESULT_OF_SUBJECT;?>";
+	    document.resultOfSubjectConstant = "<?php echo ResultService::PROPERTY_SUBJECT;?>";
 	    //initiate the grid
 	    resultTable.initiateGrid();
 	    //Bind the remove score button click that removes all variables that are taoCoding_models_classes_table_GradeColumn

@@ -42,7 +42,10 @@ $todefine = array(
 
 	// defined in tao
 	//'TAO_RESULT_CLASS'			=> 'http://www.tao.lu/Ontologies/TAOResult.rdf#Result',
-	
+
+    /**
+     * @deprecated
+     */
 	'TAO_DELIVERY_RESULT'			=> 'http://www.tao.lu/Ontologies/TAOResult.rdf#DeliveryResult',
 	'PROPERTY_RESULT_OF_SUBJECT'	=> 'http://www.tao.lu/Ontologies/TAOResult.rdf#resultOfSubject',
 	'PROPERTY_RESULT_OF_DELIVERY'	=> 'http://www.tao.lu/Ontologies/TAOResult.rdf#resultOfDelivery',

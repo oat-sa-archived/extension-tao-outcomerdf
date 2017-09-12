@@ -20,6 +20,9 @@
  */
 ?>
 <?php
+
+use oat\taoResultServer\models\classes\ResultService;
+
 require_once dirname(__FILE__) . '/../../tao/test/TaoTestRunner.php';
 include_once dirname(__FILE__) . '/../includes/raw_start.php';
 
@@ -99,10 +102,10 @@ class SimpleReportTestCase extends UnitTestCase {
 		$variableIDentifier = "GRADE";
 		$value = 0.4;
 		//create a small delivery
-		$this->subClass = $this->resultsService->createSubClass(new core_kernel_classes_Class(TAO_DELIVERY_RESULT), "UnitTestingGenClass");
+		$this->subClass = $this->resultsService->createSubClass(new core_kernel_classes_Class(ResultService::DELIVERY_RESULT), "UnitTestingGenClass");
 		$this->delivery = $this->subClass->createInstance("UnitTestingGenDelivery");
-		$this->delivery->setPropertyValue(new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY), "#unitTestResultOfDelivery");
-		$this->delivery->setPropertyValue(new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT), "#unitTestResultOfSubject");
+		$this->delivery->setPropertyValue(new core_kernel_classes_Property(ResultService::PROPERTY_DELIVERY), "#unitTestResultOfDelivery");
+		$this->delivery->setPropertyValue(new core_kernel_classes_Property(ResultService::PROPERTY_SUBJECT), "#unitTestResultOfSubject");
 		$this->delivery->setPropertyValue(new core_kernel_classes_Property(PROPERTY_RESULT_OF_PROCESS), "#unitTestResultOfProcess");
 		//stores a grade in this delivery
 		$this->grade = $this->resultsService->storeGrade($this->delivery,$this->activityExecution, $variableIDentifier, $value);
