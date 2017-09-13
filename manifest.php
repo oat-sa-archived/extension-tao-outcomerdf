@@ -28,7 +28,7 @@ return array(
     'label' => 'Result storage ontology',
 	'description' => 'TAO Results extension',
     'license' => 'GPL-2.0',
-    'version' => '2.6',
+    'version' => '2.7.0',
 	'author' => 'Open Assessment Technologies, CRP Henri Tudor',
     //taoItems is only needed for the item model property retrieval
 	'requires' => array(
@@ -49,7 +49,8 @@ return array(
             dirname(__FILE__). '/scripts/install/postInstall.php'
         )
 	),
-	'managementRole' => 'http://www.tao.lu/Ontologies/TAOResult.rdf#ResultsManagerRole',
+    'update' => 'oat\\taoResults\\scripts\\update\\Updater',
+    'managementRole' => 'http://www.tao.lu/Ontologies/TAOResult.rdf#ResultsManagerRole',
     'acl' => array(
         array('grant', 'http://www.tao.lu/Ontologies/TAOResult.rdf#ResultsManagerRole', array('ext'=>'taoResults')),
         array('grant', 'http://www.tao.lu/Ontologies/generis.rdf#AnonymousRole', array('ext'=>'taoResults', 'mod' => 'RestResults'))

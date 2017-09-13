@@ -266,7 +266,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
 
                 try {
                     common_Logger::d("Retrieving related Item model for item " . $relatedItem->getUri() . "");
-                    $itemModel = $relatedItem->getUniquePropertyValue(new core_kernel_classes_Property(TAO_ITEM_MODEL_PROPERTY));
+                    $itemModel = $relatedItem->getUniquePropertyValue(new core_kernel_classes_Property(taoItems_models_classes_ItemsService::PROPERTY_ITEM_MODEL));
                     $variablesByItem[$itemIdentifier]['itemModel'] = $itemModel->getLabel();
                 } catch (common_Exception $e) { //a resource but unknown
                     $variablesByItem[$itemIdentifier]['itemModel'] = 'unknown';
@@ -320,7 +320,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
                     $itemIdentifier = $relatedItem->getUri();
                     $itemLabel = $relatedItem->getLabel();
                     try {
-                        $itemModel = $relatedItem->getUniquePropertyValue(new core_kernel_classes_Property(TAO_ITEM_MODEL_PROPERTY));
+                        $itemModel = $relatedItem->getUniquePropertyValue(new core_kernel_classes_Property(taoItems_models_classes_ItemsService::PROPERTY_ITEM_MODEL));
                         $variablesByItem[$itemIdentifier]['itemModel'] = $itemModel->getLabel();
                     } catch (common_Exception $e) { //a resource but unknown
                         $variablesByItem[$itemIdentifier]['itemModel'] = $undefinedStr;
