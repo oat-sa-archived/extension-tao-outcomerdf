@@ -19,6 +19,7 @@
  * 
  */
 
+use oat\taoResultServer\models\classes\ResultService;
 /**
  * Results Controller provide actions performed from url resolution
  *
@@ -50,8 +51,8 @@ class taoResults_actions_InspectResults extends tao_actions_TaoModule
         $this->resultGridOptions = array(
             'columns' => array(
                 RDFS_LABEL => array('weight' => 2),
-                PROPERTY_RESULT_OF_DELIVERY => array('weight' => 2),
-                PROPERTY_RESULT_OF_SUBJECT => array('weight' => 2)
+                ResultService::PROPERTY_DELIVERY => array('weight' => 2),
+                ResultService::PROPERTY_SUBJECT => array('weight' => 2)
             )
         );
         $this->defaultData();
@@ -66,12 +67,12 @@ class taoResults_actions_InspectResults extends tao_actions_TaoModule
     public function index()
     {
         //Class to filter on
-        $rootClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+        $rootClass = new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
 
         //Properties to filter on
         $properties = array();
-        $properties[] = new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY);
-        $properties[] = new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT);
+        $properties[] = new core_kernel_classes_Property(ResultService::PROPERTY_DELIVERY);
+        $properties[] = new core_kernel_classes_Property(ResultService::PROPERTY_SUBJECT);
         //$properties[] = new core_kernel_classes_Property(RDF_TYPE);
 	
         //Monitoring grid
@@ -108,7 +109,7 @@ class taoResults_actions_InspectResults extends tao_actions_TaoModule
         //get the processes uris
         $processesUri = $this->hasRequestParameter('processesUri') ? $this->getRequestParameter('processesUri') : null;
 
-        $rootClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+        $rootClass = new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
         if (!is_null($filter)) {
             $results = $rootClass->searchInstances($filter, array('recursive' => true));
         } else if (!is_null($processesUri)) {
@@ -122,14 +123,14 @@ class taoResults_actions_InspectResults extends tao_actions_TaoModule
         $data = array();
         foreach ($results as $res) {
             $props = $res->getPropertiesValues(array(
-                PROPERTY_RESULT_OF_DELIVERY,
-                PROPERTY_RESULT_OF_SUBJECT,
+                ResultService::PROPERTY_DELIVERY,
+                ResultService::PROPERTY_SUBJECT,
                 RDF_TYPE
             ));
             $data[$res->getUri()] = array(
                 RDFS_LABEL => $res->getLabel(),
-                PROPERTY_RESULT_OF_DELIVERY => array_shift($props[PROPERTY_RESULT_OF_DELIVERY]),
-                PROPERTY_RESULT_OF_SUBJECT => array_shift($props[PROPERTY_RESULT_OF_SUBJECT]),
+                ResultService::PROPERTY_DELIVERY => array_shift($props[ResultService::PROPERTY_DELIVERY]),
+                ResultService::PROPERTY_SUBJECT => array_shift($props[ResultService::PROPERTY_SUBJECT]),
                 RDF_TYPE => array_shift($props[RDF_TYPE])
             );
         }
@@ -145,11 +146,11 @@ class taoResults_actions_InspectResults extends tao_actions_TaoModule
      * get the main class
      *
      * @author Joel Bout <joel@taotesting.com>
-     * @return core_kernel_classes_Classes
+     * @return core_kernel_classes_Class
      */
     protected function getRootClass()
     {
-        return new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+        return new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
     }
    
 }

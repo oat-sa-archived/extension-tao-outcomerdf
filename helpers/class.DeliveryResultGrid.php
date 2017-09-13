@@ -19,7 +19,7 @@
  * 
  */
 
-
+use oat\taoResultServer\models\classes\ResultService;
 
 
 /**
@@ -65,8 +65,8 @@ class taoResults_helpers_DeliveryResultGrid
 		
 		$processProperties = array(
 			RDFS_LABEL					=> __('Label'),
-			PROPERTY_RESULT_OF_DELIVERY	=> __('Delivery'),
-			PROPERTY_RESULT_OF_SUBJECT	=> __('Test taker'),
+            ResultService::PROPERTY_DELIVERY	=> __('Delivery'),
+            ResultService::PROPERTY_SUBJECT	=> __('Test taker'),
             RDF_TYPE                	=> __('Class')
 		);
 		

@@ -35,6 +35,7 @@ return array(
 	    'taoResultServer'  => '2.6',
         'taoItems' => '*'
     ),
+    'update' => 'oat\\taoResults\\scripts\\update\\Updater',
 	'models' => array(
 		'http://www.tao.lu/Ontologies/TAOResult.rdf'
 	),

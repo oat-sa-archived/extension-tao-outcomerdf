@@ -1,5 +1,7 @@
 <?php
 
+use oat\taoResultServer\models\classes\ResultService;
+
 /**
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,7 +36,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      * @see tao_models_classes_ClassService::getRootClass()
      */
     public function getRootClass() {
-        return new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+        return new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
     }
 
     /**
@@ -108,11 +110,11 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
     /**
      * Return the corresponding delivery 
      * @param core_kernel_classes_Resource $deliveryResult
-     * @return core_kernel_classes_Resource delviery
+     * @return core_kernel_classes_Container
      * @author Patrick Plichart, <patrick@taotesting.com>
      */
     public function getDelivery(core_kernel_classes_Resource $deliveryResult) {
-        return $deliveryResult->getUniquePropertyValue(new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY));
+        return $deliveryResult->getUniquePropertyValue(new core_kernel_classes_Property(ResultService::PROPERTY_DELIVERY));
     }
 
     /**
@@ -456,7 +458,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      * @author Patrick Plichart, <patrick.plichart@taotesting.com>
      */
     public function getTestTaker(core_kernel_classes_Resource $deliveryResult) {
-        $propResultOfSubject = new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT);
+        $propResultOfSubject = new core_kernel_classes_Property(ResultService::PROPERTY_SUBJECT);
         return $deliveryResult->getUniquePropertyValue($propResultOfSubject);
     }
     /**
@@ -467,7 +469,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      */
     public function storeDeliveryResult($deliveryResultIdentifier = null) {
 
-        $deliveryResultClass = new core_kernel_classes_Class(TAO_DELIVERY_RESULT);
+        $deliveryResultClass = new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
         if (is_null($deliveryResultIdentifier)) {
             $id = uniqid();
             $deliveryResult = $deliveryResultClass->createInstanceWithProperties(array(
@@ -510,7 +512,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      * @param string testTakerIdentifier (uri recommended)
      */
     public function storeTestTaker(core_kernel_classes_Resource $deliveryResult, $testTakerIdentifier) {
-        $propResultOfSubject = new core_kernel_classes_Property(PROPERTY_RESULT_OF_SUBJECT);
+        $propResultOfSubject = new core_kernel_classes_Property(ResultService::PROPERTY_SUBJECT);
         $deliveryResult->editPropertyValues($propResultOfSubject, $testTakerIdentifier);
         
         try {
@@ -522,11 +524,14 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
             // the test taker to be referrd in the delivery Result does not exist (or the label is not stated)
         }
     }
+
     /**
-     * @param string deliveryIdentifier (uri recommended)
+     * @param core_kernel_classes_Resource $deliveryResult
+     * @param $deliveryIdentifier
+     * @internal param deliveryIdentifier $string (uri recommended)
      */
     public function storeDelivery(core_kernel_classes_Resource $deliveryResult, $deliveryIdentifier) {
-        $propResultOfDelivery = new core_kernel_classes_Property(PROPERTY_RESULT_OF_DELIVERY);
+        $propResultOfDelivery = new core_kernel_classes_Property(ResultService::PROPERTY_DELIVERY);
         $deliveryResult->editPropertyValues($propResultOfDelivery, $deliveryIdentifier);
 
         try {
