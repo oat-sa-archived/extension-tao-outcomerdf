@@ -36,7 +36,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      * @see tao_models_classes_ClassService::getRootClass()
      */
     public function getRootClass() {
-        return new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
+        return new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT);
     }
 
     /**
@@ -469,7 +469,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      */
     public function storeDeliveryResult($deliveryResultIdentifier = null) {
 
-        $deliveryResultClass = new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
+        $deliveryResultClass = new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT);
         if (is_null($deliveryResultIdentifier)) {
             $id = uniqid();
             $deliveryResult = $deliveryResultClass->createInstanceWithProperties(array(

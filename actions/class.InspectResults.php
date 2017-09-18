@@ -67,7 +67,7 @@ class taoResults_actions_InspectResults extends tao_actions_TaoModule
     public function index()
     {
         //Class to filter on
-        $rootClass = new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
+        $rootClass = new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT);
 
         //Properties to filter on
         $properties = array();
@@ -109,7 +109,7 @@ class taoResults_actions_InspectResults extends tao_actions_TaoModule
         //get the processes uris
         $processesUri = $this->hasRequestParameter('processesUri') ? $this->getRequestParameter('processesUri') : null;
 
-        $rootClass = new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
+        $rootClass = new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT);
         if (!is_null($filter)) {
             $results = $rootClass->searchInstances($filter, array('recursive' => true));
         } else if (!is_null($processesUri)) {
@@ -150,7 +150,7 @@ class taoResults_actions_InspectResults extends tao_actions_TaoModule
      */
     protected function getRootClass()
     {
-        return new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
+        return new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT);
     }
    
 }

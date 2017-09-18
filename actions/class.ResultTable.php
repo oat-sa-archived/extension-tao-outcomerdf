@@ -97,7 +97,7 @@ class taoResults_actions_ResultTable extends tao_actions_Table {
 
 		$columns = array();
 		$filter = $this->getFilterState('filter');
-		$deliveryResultClass	= new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
+		$deliveryResultClass	= new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT);
 
 		//The list of delivery Results matching the current selection filters
 		$results	= $deliveryResultClass->searchInstances($filter, array ('recursive'=>true));
@@ -223,7 +223,7 @@ class taoResults_actions_ResultTable extends tao_actions_Table {
         $searchString = $this->getRequestParameter('searchString');
         $start = $limit * $page - $limit;
         $response = new stdClass();
-       	$clazz = new core_kernel_classes_Class(ResultService::DELIVERY_RESULT);
+       	$clazz = new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT);
         $results = $clazz->searchInstances($filter, array ('recursive'=>true, 'like' => false,'offset' => $start, 'limit' => $limit));
         $counti	= count($results);
         $dpmap = array();
