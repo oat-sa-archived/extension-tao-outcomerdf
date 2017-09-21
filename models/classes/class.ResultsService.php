@@ -36,7 +36,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      * @see tao_models_classes_ClassService::getRootClass()
      */
     public function getRootClass() {
-        return new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT);
+        return new core_kernel_classes_Class(ResultService::DELIVERY_RESULT_CLASS_URI);
     }
 
     /**
@@ -114,7 +114,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      * @author Patrick Plichart, <patrick@taotesting.com>
      */
     public function getDelivery(core_kernel_classes_Resource $deliveryResult) {
-        return $deliveryResult->getUniquePropertyValue(new core_kernel_classes_Property(ResultService::PROPERTY_DELIVERY));
+        return $deliveryResult->getUniquePropertyValue(new core_kernel_classes_Property(ResultService::DELIVERY_CLASS_URI));
     }
 
     /**
@@ -458,7 +458,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      * @author Patrick Plichart, <patrick.plichart@taotesting.com>
      */
     public function getTestTaker(core_kernel_classes_Resource $deliveryResult) {
-        $propResultOfSubject = new core_kernel_classes_Property(ResultService::PROPERTY_SUBJECT);
+        $propResultOfSubject = new core_kernel_classes_Property(ResultService::SUBJECT_CLASS_URI);
         return $deliveryResult->getUniquePropertyValue($propResultOfSubject);
     }
     /**
@@ -469,7 +469,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      */
     public function storeDeliveryResult($deliveryResultIdentifier = null) {
 
-        $deliveryResultClass = new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT);
+        $deliveryResultClass = new core_kernel_classes_Class(ResultService::DELIVERY_RESULT_CLASS_URI);
         if (is_null($deliveryResultIdentifier)) {
             $id = uniqid();
             $deliveryResult = $deliveryResultClass->createInstanceWithProperties(array(
@@ -512,7 +512,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      * @param string testTakerIdentifier (uri recommended)
      */
     public function storeTestTaker(core_kernel_classes_Resource $deliveryResult, $testTakerIdentifier) {
-        $propResultOfSubject = new core_kernel_classes_Property(ResultService::PROPERTY_SUBJECT);
+        $propResultOfSubject = new core_kernel_classes_Property(ResultService::SUBJECT_CLASS_URI);
         $deliveryResult->editPropertyValues($propResultOfSubject, $testTakerIdentifier);
         
         try {
@@ -531,7 +531,7 @@ class taoResults_models_classes_ResultsService extends tao_models_classes_ClassS
      * @internal param deliveryIdentifier $string (uri recommended)
      */
     public function storeDelivery(core_kernel_classes_Resource $deliveryResult, $deliveryIdentifier) {
-        $propResultOfDelivery = new core_kernel_classes_Property(ResultService::PROPERTY_DELIVERY);
+        $propResultOfDelivery = new core_kernel_classes_Property(ResultService::DELIVERY_CLASS_URI);
         $deliveryResult->editPropertyValues($propResultOfDelivery, $deliveryIdentifier);
 
         try {

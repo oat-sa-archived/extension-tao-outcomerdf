@@ -102,10 +102,10 @@ class SimpleReportTestCase extends UnitTestCase {
 		$variableIDentifier = "GRADE";
 		$value = 0.4;
 		//create a small delivery
-		$this->subClass = $this->resultsService->createSubClass(new core_kernel_classes_Class(ResultService::PROPERTY_DELIVERY_RESULT), "UnitTestingGenClass");
+		$this->subClass = $this->resultsService->createSubClass(new core_kernel_classes_Class(ResultService::DELIVERY_RESULT_CLASS_URI), "UnitTestingGenClass");
 		$this->delivery = $this->subClass->createInstance("UnitTestingGenDelivery");
-		$this->delivery->setPropertyValue(new core_kernel_classes_Property(ResultService::PROPERTY_DELIVERY), "#unitTestResultOfDelivery");
-		$this->delivery->setPropertyValue(new core_kernel_classes_Property(ResultService::PROPERTY_SUBJECT), "#unitTestResultOfSubject");
+		$this->delivery->setPropertyValue(new core_kernel_classes_Property(ResultService::DELIVERY_CLASS_URI), "#unitTestResultOfDelivery");
+		$this->delivery->setPropertyValue(new core_kernel_classes_Property(ResultService::SUBJECT_CLASS_URI), "#unitTestResultOfSubject");
 		$this->delivery->setPropertyValue(new core_kernel_classes_Property(PROPERTY_RESULT_OF_PROCESS), "#unitTestResultOfProcess");
 		//stores a grade in this delivery
 		$this->grade = $this->resultsService->storeGrade($this->delivery,$this->activityExecution, $variableIDentifier, $value);

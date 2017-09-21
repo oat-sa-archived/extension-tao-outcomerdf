@@ -65,8 +65,8 @@ class taoResults_helpers_DeliveryResultGrid
 		
 		$processProperties = array(
 			RDFS_LABEL					=> __('Label'),
-            ResultService::PROPERTY_DELIVERY	=> __('Delivery'),
-            ResultService::PROPERTY_SUBJECT	=> __('Test taker'),
+            ResultService::DELIVERY_CLASS_URI	=> __('Delivery'),
+            ResultService::SUBJECT_CLASS_URI	=> __('Test taker'),
             RDF_TYPE                	=> __('Class')
 		);
 		
